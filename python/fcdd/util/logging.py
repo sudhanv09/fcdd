@@ -297,7 +297,7 @@ class Logger(object):
         :return:
         """
         matplotlib.use('Agg')
-        outfile = pt.join(self.dir, subdir, 'err.pdf')
+        outfile = pt.join(self.dir, subdir, 'err.png')
         if not pt.exists(os.path.dirname(outfile)):
             os.makedirs(os.path.dirname(outfile))
         plt.plot(self.history['err'], ls='-')
@@ -308,7 +308,7 @@ class Logger(object):
         plt.legend(legend)
         plt.ylabel('error')
         plt.xlabel('epoch')
-        plt.savefig(outfile, format='pdf')
+        plt.savefig(outfile, format='png')
         plt.close()
         for k in self.__further_keys:
             if k == 'val_err':
@@ -316,7 +316,7 @@ class Logger(object):
             plt.plot(self.history[k], ls='-')
             plt.ylabel(k)
             plt.xlabel('epoch')
-            plt.savefig(outfile.replace('err.pdf', '{}.pdf'.format(k)))
+            plt.savefig(outfile.replace('err.png', '{}.png'.format(k)))
             plt.close()
 
     def single_plot(self, name: str, values: List[float], xs: List[float] = None,
@@ -334,7 +334,7 @@ class Logger(object):
         :return:
         """
         matplotlib.use('Agg')
-        outfile = pt.join(self.dir, subdir, '{}.pdf'.format(name))
+        outfile = pt.join(self.dir, subdir, '{}.png'.format(name))
         if not pt.exists(os.path.dirname(outfile)):
             os.makedirs(os.path.dirname(outfile))
         if xs is None:
@@ -344,7 +344,7 @@ class Logger(object):
         plt.legend(legend)
         plt.ylabel(ylabel)
         plt.xlabel(xlabel)
-        plt.savefig(outfile, format='pdf')
+        plt.savefig(outfile, format='png')
         plt.close()
 
     def imsave(self, name: str, tensors: Tensor, subdir='.', nrow=8, scale_mode='each',
@@ -552,7 +552,7 @@ def plot_many_roc(logdir: str, results: List[dict], labels: List[str] = None, na
     if results is None or any([r is None for r in results]) or len(results) == 0:
         return None
     matplotlib.use('Agg')
-    outfile = pt.join(logdir, '{}.pdf'.format(name))
+    outfile = pt.join(logdir, '{}.png'.format(name))
     if not pt.exists(os.path.dirname(outfile)):
         os.makedirs(os.path.dirname(outfile))
     if labels is None:
@@ -568,6 +568,6 @@ def plot_many_roc(logdir: str, results: List[dict], labels: List[str] = None, na
         plt.plot(mean_res[x], mean_res[y], '--', linewidth=1)
         legend.append('{} {:5.2f}%'.format('mean', mean_res['auc'] * 100))
     plt.legend(legend,  fontsize='xx-small' if len(legend) > 20 else 'x-small')
-    plt.savefig(outfile, format='pdf')
+    plt.savefig(outfile, format='png')
     plt.close()
 
