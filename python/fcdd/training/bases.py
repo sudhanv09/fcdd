@@ -12,7 +12,7 @@ from fcdd.models.bases import BaseNet, ReceptiveNet
 from fcdd.training import balance_labels
 from fcdd.util.logging import colorize as colorize_img, Logger
 from kornia import gaussian_blur2d
-from sklearn.metrics import roc_auc_score, roc_curve
+from sklearn.metrics import roc_auc_score, roc_curve, precision_recall_curve, auc
 from torch import Tensor
 from torch.optim.lr_scheduler import _LRScheduler
 from torch.optim.optimizer import Optimizer
@@ -352,13 +352,19 @@ class BaseADTrainer(BaseTrainer):
         # Overall ROC for sample-wise anomaly detection
         fpr, tpr, thresholds = roc_curve(labels, red_ascores)
         roc_score = roc_auc_score(labels, red_ascores)
-        roc_res = {'tpr': tpr, 'fpr': fpr, 'ths': thresholds, 'auc': roc_score}
+        precision, recall, pr_thresholds = precision_recall_curve(labels, red_ascores)
+        aupr_score = auc(recall, precision)
         self.logger.single_plot(
             'roc_curve', tpr, fpr, xlabel='false positive rate', ylabel='true positive rate',
             legend=['auc={}'.format(roc_score)], subdir=subdir
         )
+        self.logger.single_plot(
+         'aupr_curve', recall, precision, xlabel='recall', ylabel='precision',
+          legend=['aupr={}'.format(aupr_score)], subdir=subdir
+        )
+        roc_res = {'tpr': tpr, 'fpr': fpr, 'ths': thresholds, 'auc': roc_score, 'precision': precision, 'recall': recall}
         self.logger.single_save('roc', roc_res, subdir=subdir)
-        self.logger.logtxt('##### ROC TEST SCORE {} #####'.format(roc_score), print=True)
+        self.logger.logtxt('##### ROC TEST SCORE {}, AUPR score: {} #####'.format(roc_score, aupr_score), print=True)
 
         # GTMAPS pixel-wise anomaly detection = explanation performance
         gtmap_roc_res, gtmap_prc_res = None, None
