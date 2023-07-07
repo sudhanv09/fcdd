@@ -64,7 +64,7 @@ class FCDD_CNN224_VGG(FCDDNet):
         super().__init__(in_shape, **kwargs)
         assert self.bias, 'VGG net is only supported with bias atm!'
         state_dict = load_state_dict_from_url(
-            torchvision.models.vgg.model_urls['vgg11_bn'],
+            torchvision.models.resnet18(pretrained=True)
             model_dir=pt.join(pt.dirname(__file__), '..', '..', '..', 'data', 'models')
         )
         features_state_dict = {k[9:]: v for k, v in state_dict.items() if k.startswith('features')}
